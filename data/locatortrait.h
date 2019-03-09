@@ -16,10 +16,9 @@ namespace laguna {
     template<typename TKey>
     class Locator {
     protected:
-        virtual const std::vector <TKey> getKeys() = 0;
+        virtual const std::vector <TKey> getKeys() const = 0;
     public:
 
-        std::vector <TKey> Keys(){return getKeys();}
         std::pair<int, int> locate(const TKey &key) {
 
             auto m_keys = getKeys();

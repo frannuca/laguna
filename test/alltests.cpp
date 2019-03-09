@@ -91,12 +91,14 @@ BOOST_AUTO_TEST_CASE(FRAMETESTS)
         BOOST_CHECK_CLOSE(seriespow2[3],series1[3]*series1[3],0.01);
         BOOST_CHECK_CLOSE(seriessqrt2[3],series1[3],0.01);
 
-/*
-        auto seriespow2_key =  series1.mapValues([](const int& x){return x*x;});
-        auto seriessqrt2_key = seriespow2.mapValues([](const int& x){return (int)std::sqrt(x);});
-        BOOST_CHECK_CLOSE(seriespow2_key.Keys()[3],series1[3]*series1[3],0.01);
-        BOOST_CHECK_CLOSE(seriessqrt2_key.Keys()[3],series1[3],0.01);
-*/
+
+        auto keys1 = series1.Keys();
+        auto seriespow2_key =  series1.mapKeys<double>([](const int& x){return x*x;});
+        auto seriessqrt2_key = seriespow2_key.mapKeys<double>([](const int& x){return std::sqrt(x);});
+
+        BOOST_CHECK_CLOSE(seriespow2_key.Keys()[3],double(keys1[3]*keys1[3]),0.01);
+        BOOST_CHECK_CLOSE(seriessqrt2_key.Keys()[3],double(keys1[3]),0.01);
+
 
     }
     std::cout<<"finished";

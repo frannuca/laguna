@@ -29,7 +29,7 @@ namespace laguna {
             protected MissingTrait<T>{
     protected:
         std::vector<std::pair<TKey, void*>> m_data;
-        virtual const std::vector <TKey> getKeys();
+        virtual const std::vector <TKey> getKeys() const;
         void sortSeries();
         void deleteData();
         Series<TKey,T> binaryOp(const Series<TKey,T>& a,std::function<T (const T&, const T&)> fop) const;
@@ -52,6 +52,7 @@ namespace laguna {
 
         T& operator[](const TKey& key);
 
+        std::vector <TKey> Keys() const {return  this->getKeys();}
         std::vector<std::pair<TKey, T>> getValues() const;
 
         Series<TKey,T> operator+(const Series<TKey,T>& that) const;
@@ -59,11 +60,12 @@ namespace laguna {
 
         Series<TKey,T> operator-(const Series<TKey,T>& that) const {return *this + (-that);}
         Series<TKey,T> mapValues(std::function<T(const T&)> pred) const;
-        Series<TKey,T> mapKeys(std::function<T(const TKey&)> pred) const;
+        template<typename A>
+        Series<A,T> mapKeys(std::function<A(const TKey&)> pred) const;
     };
 
     template<typename TKey, typename T>
-    const std::vector<TKey> Series<TKey, T>::getKeys() {
+    const std::vector<TKey> Series<TKey, T>::getKeys() const {
         std::vector<TKey> keys;
         std::transform(m_data.begin(),m_data.end(),std::back_inserter(keys),[](auto& p){return p.first;});
         return keys;
@@ -279,12 +281,17 @@ namespace laguna {
     }
 
     template<typename TKey, typename T>
-    Series<TKey, T> Series<TKey, T>::mapKeys(std::function<T(const TKey &)> pred) const {
+    template<typename A>
+    Series<A, T> Series<TKey, T>::mapKeys(std::function<A(const TKey &)> pred) const {
         auto pairs = getValues();
-        for(auto& x:pairs){
-            x.first=pred(x.first);
-        }
-        return Series().withData(pairs);
+        std::vector<std::pair<A,T>> newpairs;
+        std::transform(pairs.begin(),pairs.end(),
+                std::back_inserter(newpairs),
+                [pred](const std::pair<TKey,T>& x){
+            return std::make_pair(pred(x.first),x.second);
+        });
+
+        return Series<A,T>().withData(newpairs);
     }
 
 }
