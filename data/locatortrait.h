@@ -32,8 +32,6 @@ namespace laguna {
             while (++counter < maxcount && (nhigh - nlow) > 0) {
                 nmid = int((nlow + nhigh) / 2.0);
                 TKey &xmid = m_keys[nmid];
-                TKey &xlow = m_keys[nlow];
-                TKey &xhigh = m_keys[nhigh];
 
                 if (xmid < key) {
                     nlow = nmid;

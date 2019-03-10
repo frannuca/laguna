@@ -31,11 +31,9 @@ namespace laguna {
         return cpy;
     }
 
-
     class Constants{
         public:
-        enum AddDataType {WithReplacement=0,ErrorOnDuplication,ClearAndAdd};
+            enum AddDataType {ClearAndAdd=1000,WithReplacement,ErrorOnDuplication};
         };
-
 }
 #endif //LAGUNA_CONVERTERS_H

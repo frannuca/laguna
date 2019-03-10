@@ -43,5 +43,12 @@ namespace laguna {
         MissingTrait() : missing("NA") {}
     };
 
+    template<>
+    class MissingTrait<bool> {
+    public:
+        const bool missing;
+        typedef bool value_type;
+        MissingTrait() : missing(false) {}
+    };
 }
 #endif //PROJECT_MISSINGTRAITS_H

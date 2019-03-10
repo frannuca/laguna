@@ -1,8 +1,12 @@
 project(tests)
 
+if(NOT CMAKE_BUILD_TYPE)
+    message(STATUS "--------------------------->setting release mode")
+    set(CMAKE_BUILD_TYPE Release)
+endif()
 
 
-message(STATUS "------------------:configuring unix")
+message(STATUS "------------------:configuring unix ad build type " ${CMAKE_BUILD_TYPE})
 #set(BOOST_LIBRARYDIR " /usr/lib/x86_64-linux-gnu/")
 #set(BOOST_ROOT "/user/include/")
 
@@ -33,7 +37,11 @@ foreach(testSrc ${SOURCES})
     get_filename_component(testName ${testSrc} NAME_WE)
 
     #Add compile target
+    set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra")
     set(CMAKE_CXX_STANDARD 17)
+    set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3")
     add_executable(${testName} ${testSrc})
     add_dependencies(${testName} laguna)
 

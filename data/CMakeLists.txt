@@ -3,8 +3,11 @@ cmake_minimum_required(VERSION 3.10)
 project(laguna VERSION 1.0.0 DESCRIPTION "Data frame and series implementation")
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
-message(STATUS "------------------:configuring unix")
+message(STATUS "------------------:configuring unix ad build type " ${CMAKE_BUILD_TYPE})
 #set(BOOST_LIBRARYDIR " /usr/lib/x86_64-linux-gnu/")
 #set(BOOST_ROOT "/user/include/")
 
@@ -28,10 +31,10 @@ link_directories(${Boost_LIBRARY_DIRS} )
 #Add compile target
 
 add_library(laguna SHARED
-                    ${CMAKE_SOURCE_DIR}/data/vectoroperator.h
                     ${CMAKE_SOURCE_DIR}/data/converters.h
                     ${CMAKE_SOURCE_DIR}/data/locatortrait.h
                     ${CMAKE_SOURCE_DIR}/data/missingtraits.h
                     ${CMAKE_SOURCE_DIR}/data/series.h
+                    ${CMAKE_SOURCE_DIR}/data/seriesStorage.h
                     ${CMAKE_SOURCE_DIR}/data/series.cpp)
 target_link_libraries(laguna ${Boost_LIBRARIES})
