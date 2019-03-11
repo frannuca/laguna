@@ -30,7 +30,10 @@ endif()
 include_directories( ${Boost_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/frame)
 link_directories(${Boost_LIBRARY_DIRS}  ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
-set(SOURCES ${CMAKE_SOURCE_DIR}/test/alltests.cpp)
+set(SOURCES
+        ${CMAKE_SOURCE_DIR}/test/alltests.cpp
+        ${CMAKE_SOURCE_DIR}/test/test_series.cpp
+        )
 
 foreach(testSrc ${SOURCES})
     #Extract the filename without an extension (NAME_WE)
