@@ -94,8 +94,8 @@ BOOST_AUTO_TEST_CASE(FRAMETESTS)
         auto zeroseries = series1 - series1;
         BOOST_CHECK_CLOSE(zeroseries.sum(),0.0,0.01);
 
-        auto seriesx23 = series1 * 23;
-        BOOST_CHECK_CLOSE(series1[3]*23,seriesx23[3],0.01);
+        auto seriesx23 = series1 * 23.0;
+        BOOST_CHECK_CLOSE(series1[3]*23.0,seriesx23[3],0.01);
 
         auto series_div =  23.0 / seriesx23 ;
         BOOST_CHECK_CLOSE(series_div[3],1.0/series1[3],0.01);

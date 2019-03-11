@@ -25,6 +25,20 @@
 
 namespace laguna {
 
+    template<typename A, typename  B> class Series;
+
+    template<typename A,typename B>
+    Series<A,B> operator*(const B& l, const Series<A,B>& series);
+
+    template<typename A,typename B>
+    Series<A,B> operator*(const Series<A,B>& series,const B& l);
+
+    template<typename A,typename B>
+    Series<A,B> operator/(const B& l, const Series<A,B>& series);
+
+    template<typename A,typename B>
+    Series<A,B> operator/( const Series<A,B>& series,const B& l);
+
     template<typename TKey, typename T>
     class Series : protected SeriesStorage<TKey,T>{
     protected:
@@ -46,7 +60,6 @@ namespace laguna {
         /** operators **/
         Series<TKey,T> operator+(const Series<TKey,T>& that) const;
         Series<TKey,T> operator*(const Series<TKey,T>& that) const;
-        Series<TKey,T> operator*(const T& l) const;
         Series<TKey,T> operator/(const Series<TKey,T>& that) const;
         Series<TKey,T> operator-() const;
         Series<TKey,T> operator-(const Series<TKey,T>& that) const {return *this + (-that);}
@@ -55,7 +68,13 @@ namespace laguna {
         friend Series<A,B> operator*(const B& l, const Series<A,B>& series);
 
         template<typename A,typename B>
+        friend Series<A,B> operator*(const Series<A,B>& series,const B& l);
+
+        template<typename A,typename B>
         friend Series<A,B> operator/(const B& l, const Series<A,B>& series);
+
+        template<typename A,typename B>
+        friend Series<A,B> operator/( const Series<A,B>& series,const B& l);
 
         /** mapping **/
         Series<TKey,T> mapValues(std::function<T(const T&)> pred) const;
@@ -76,7 +95,7 @@ namespace laguna {
 
     template<typename TKey, typename T>
     Series<TKey, T> operator*(const T &l, const Series<TKey, T> &series) {
-        return series.operator*(l);
+        return series.applyUnaryOp([&l](const T &x) { return l * x; });
     }
 
     template<typename TKey, typename T>
@@ -176,10 +195,6 @@ namespace laguna {
         return applyBinaryOp(that, [](const T &a, const T &b) { return a / b; });
     }
 
-    template<typename TKey, typename T>
-    Series<TKey, T> Series<TKey, T>::operator*(const T& l) const {
-        return applyUnaryOp([&l](const T &x) { return l * x; });
-    }
 
     template<typename TKey, typename T>
     T Series<TKey, T>::sum() {
@@ -203,6 +218,16 @@ namespace laguna {
     template<typename TKey, typename T>
     Series<TKey, T> Series<TKey, T>::applyUnaryOp(std::function<T(const T &)> fop) const {
         return Series().withData(this->SeriesStorage<TKey, T>::unaryOp(fop));
+    }
+
+    template<typename A, typename B>
+    Series<A, B> operator*(const Series<A, B> &series, const B &l) {
+        return series.applyUnaryOp([&l](const B &x) { return l * x; });
+    }
+
+    template<typename A, typename B>
+    Series<A, B> operator/(const Series<A, B> &series, const B &l) {
+        return series.applyUnaryOp([&l](const B &x) { return  x/l; });
     }
 
 

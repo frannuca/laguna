@@ -71,37 +71,68 @@ BOOST_AUTO_TEST_CASE(SERIESTESTS)
         std::cout<<"Checking  series<date,double>::operator[](int)"<<std::endl;
         series1[d0+days(11)] = 42.0;
         BOOST_CHECK_CLOSE(42.0, series1[d0+days(11)], 1e-3);
+        std::cout<<"OK. access modified values"<<std::endl;
     }
 
     {
+        std::cout<<"Starting series<date,double> ctor"<<std::endl;
         auto series1 = GetDateSeries();
         auto iscritical = [](std::exception) { return true; };
 
+        std::cout<<"deleting date key"<<std::endl;
         series1.deleteKey(d0);
         BOOST_REQUIRE_EXCEPTION(series1[d0], std::exception, iscritical);
 
+        std::cout<<"OK. access exception captured"<<std::endl;
     }
     {
+        std::cout<<"Checking operations on series"<<std::endl;
         auto series1 = GetDateSeries();
+        std::cout<<"Checking (+) ..."<<std::endl;
         auto seriesx2 = series1 + series1;
         BOOST_CHECK_CLOSE(series1[d0+days(3)]*2.0,seriesx2[d0+days(3)],0.01);
 
         //back to the original series values:
+        std::cout<<"Checking (-) ..."<<std::endl;
         auto seriesorig = seriesx2 - series1;
         BOOST_CHECK_CLOSE(seriesorig[d0+days(3)],series1[d0+days(3)],0.01);
 
+        std::cout<<"Checking unary (-) ..."<<std::endl;
         auto seriesorig_x = seriesx2 + (-series1);
         BOOST_CHECK_CLOSE(seriesorig_x[d0+days(3)],series1[d0+days(3)],0.01);
 
+        std::cout<<"Checking (*) ..."<<std::endl;
+        auto series_prod = series1 * series1;
+        BOOST_CHECK_CLOSE(series_prod[d0+days(3)],series1[d0+days(3)]*series1[d0+days(3)],0.01);
 
+        std::cout<<"Checking (/) ..."<<std::endl;
+        auto series_div = series1 / series1;
+        BOOST_CHECK_CLOSE(series_div[d0+days(3)],1.0,0.01);
+
+        std::cout<<"Checking (l * series * l) ..."<<std::endl;
+        auto series_scalar_prod = 10.0 * series1 *10.0;
+        BOOST_CHECK_CLOSE(series_scalar_prod[d0+days(3)],series1[d0+days(3)]*100.0,0.01);
+
+        std::cout<<"Checking (l / series ) ..."<<std::endl;
+        auto series_scalar_div_1 = 1.0 / series1 ;
+        BOOST_CHECK_CLOSE(series_scalar_div_1[d0+days(3)],1.0/series1[d0+days(3)],0.01);
+
+        std::cout<<"Checking ( series/10.0 ) ..."<<std::endl;
+        auto series_scalar_div_2 = series1 / 10.0;
+        BOOST_CHECK_CLOSE(series_scalar_div_2[d0+days(3)],series1[d0+days(3)]/10.0,0.01);
+
+        std::cout<<"Checking  map values pow(x,2)..."<<std::endl;
         auto seriespow2 = series1.mapValues([](const double& x){return x*x;});
-        auto seriessqrt2 = seriespow2.mapValues([](const double& x){return std::sqrt(x);});
-
         BOOST_CHECK_CLOSE(seriespow2[d0+days(3)],series1[d0+days(3)]*series1[d0+days(3)],0.01);
+
+        std::cout<<"Checking  map values pow(x,2)..."<<std::endl;
+        auto seriessqrt2 = seriespow2.mapValues([](const double& x){return std::sqrt(x);});
         BOOST_CHECK_CLOSE(seriessqrt2[d0+days(3)],series1[d0+days(3)],0.01);
 
         ptime epoch = time_from_string("1970-01-01 00:00:00.000");
 
+
+        std::cout<<"Checking  map keys int -> date  sqrt(pow(_,2))..."<<std::endl;
         auto seriespow2_key =  series1.mapKeys<long long>([&epoch](const date& x){
             return (ptime(x)-epoch).total_seconds();
         });
