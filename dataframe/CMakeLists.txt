@@ -31,10 +31,10 @@ link_directories(${Boost_LIBRARY_DIRS} )
 #Add compile target
 
 add_library(laguna SHARED
-                    ${CMAKE_SOURCE_DIR}/data/converters.h
-                    ${CMAKE_SOURCE_DIR}/data/locatortrait.h
-                    ${CMAKE_SOURCE_DIR}/data/missingtraits.h
-                    ${CMAKE_SOURCE_DIR}/data/series.h
-                    ${CMAKE_SOURCE_DIR}/data/seriesStorage.h
-                    ${CMAKE_SOURCE_DIR}/data/series.cpp)
+                    ${CMAKE_SOURCE_DIR}/dataframe/include/converters.h
+                    ${CMAKE_SOURCE_DIR}/dataframe/include/locatortrait.h
+                    ${CMAKE_SOURCE_DIR}/dataframe/include/missingtraits.h
+                    ${CMAKE_SOURCE_DIR}/dataframe/include/series.h
+                    ${CMAKE_SOURCE_DIR}/dataframe/include/seriesStorage.h
+                    ${CMAKE_SOURCE_DIR}/dataframe/series.cpp)
 target_link_libraries(laguna ${Boost_LIBRARIES})

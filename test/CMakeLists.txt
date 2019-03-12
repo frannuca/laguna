@@ -27,7 +27,7 @@ if(NOT Boost_FOUND)
     error("BOOST LIBS not found")
 endif()
 
-include_directories( ${Boost_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/frame)
+include_directories( ${Boost_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/dataframe/include)
 link_directories(${Boost_LIBRARY_DIRS}  ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
 set(SOURCES

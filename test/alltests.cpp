@@ -12,7 +12,7 @@
 #include <random>
 #include <chrono>
 
-#include "../data/series.h"
+#include <series.h>
 
 using namespace std;
 namespace tt = boost::test_tools;

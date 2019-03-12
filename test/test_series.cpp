@@ -13,7 +13,7 @@
 #include <random>
 #include <chrono>
 
-#include "../data/series.h"
+#include "series.h"
 #include <boost/date_time.hpp>
 #include <boost/date_time/gregorian_calendar.hpp>
 
