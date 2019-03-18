@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(FRAMETESTS)
 
 
         series1[3]=33.0;
-        std::vector<std::pair<int,double>> aa = series1.values();
+        std::vector<std::pair<int,double>> aa = series1.valuesAll();
         aa[0] = std::make_pair(0,0.0);
         auto entryor33 = std::find_if(aa.begin(),aa.end(),[](const std::pair<int,double>&p)
         {

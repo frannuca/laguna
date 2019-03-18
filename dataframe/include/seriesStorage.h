@@ -29,12 +29,13 @@ namespace laguna {
                      Constants::AddDataType adddata=Constants::ErrorOnDuplication);
         std::vector<std::pair<TKey,T>> binaryOp(const SeriesStorage<TKey,T>& a,std::function<T (const T&, const T&)> fop) const;
         virtual std::vector<std::pair<TKey,T>> unaryOp(std::function<T(const T &)> fop) const;
-
+        std::vector<std::pair<TKey, void*>> valuesAllRaw() const;
+        std::vector<void*> valuesRaw() const;
     public:
         void sortSeries();
         void deleteItem(const TKey& key);
-        std::vector<std::pair<TKey, T>> getValues() const;
-
+        std::vector<std::pair<TKey, T>> valuesAll() const;
+        std::vector<T> values() const;
         virtual const std::vector <TKey> getKeys() const;
         virtual ~SeriesStorage();
     };
@@ -170,7 +171,7 @@ namespace laguna {
 
     template<typename TKey, typename T>
     std::vector<std::pair<TKey, T>> SeriesStorage<TKey, T>::unaryOp(std::function<T(const T &)> fop) const {
-        auto series = this->getValues();
+        auto series = this->valuesAll();
 
         for(size_t i=0;i<series.size();++i){
             series[i].second = fop(series[i].second);
@@ -180,7 +181,7 @@ namespace laguna {
     }
 
     template<typename TKey, typename T>
-    std::vector<std::pair<TKey, T>> SeriesStorage<TKey, T>::getValues() const {
+    std::vector<std::pair<TKey, T>> SeriesStorage<TKey, T>::valuesAll() const {
         auto& m_data = this->SeriesStorage<TKey,T>::m_data;
 
         std::vector<std::pair<TKey, T>> x;
@@ -197,6 +198,32 @@ namespace laguna {
         std::vector<TKey> keys;
         std::transform(m_data.begin(),m_data.end(),std::back_inserter(keys),[](auto& p){return p.first;});
         return keys;
+    }
+
+    template<typename TKey, typename T>
+    std::vector<T> SeriesStorage<TKey, T>::values() const {
+        std::vector<T> x;
+        std::transform(m_data.begin(),m_data.end(),std::back_inserter(x),[](const std::pair<TKey,void*>* z){return voidToTypeReference(z);});
+        return x;
+    }
+
+    template<typename TKey, typename T>
+    std::vector<std::pair<TKey, void*>> SeriesStorage<TKey, T>::valuesAllRaw() const {
+        auto& m_data = this->SeriesStorage<TKey,T>::m_data;
+
+        std::vector<std::pair<TKey, void*>> x;
+        std::transform(m_data.begin(),
+                       m_data.end(),
+                       std::back_inserter(x),
+                       [](auto& y){return std::make_pair(y.first,getVoidCopy<T>(y.second));});
+        return x;
+    }
+
+    template<typename TKey, typename T>
+    std::vector<void *> SeriesStorage<TKey, T>::valuesRaw() const {
+        std::vector<void*> x;
+        std::transform(m_data.begin(),m_data.end(),std::back_inserter(x),[](const std::pair<TKey,void*>* z){return getVoidCopy<T>(z);});
+        return x;
     }
 };
 #endif //PROJECT_SERIESSTORAGE_H

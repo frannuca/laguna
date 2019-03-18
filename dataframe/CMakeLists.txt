@@ -35,6 +35,7 @@ add_library(laguna SHARED
                     ${CMAKE_SOURCE_DIR}/dataframe/include/locatortrait.h
                     ${CMAKE_SOURCE_DIR}/dataframe/include/missingtraits.h
                     ${CMAKE_SOURCE_DIR}/dataframe/include/series.h
+                    ${CMAKE_SOURCE_DIR}/dataframe/include/frame.h
                     ${CMAKE_SOURCE_DIR}/dataframe/include/seriesStorage.h
                     ${CMAKE_SOURCE_DIR}/dataframe/series.cpp)
 target_link_libraries(laguna ${Boost_LIBRARIES})

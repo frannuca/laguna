@@ -21,7 +21,7 @@ using namespace std;
 namespace tt = boost::test_tools;
 #include <iostream>
 #include <limits>
-
+#include "frame.h"
 
 using namespace laguna;
 
@@ -50,6 +50,7 @@ Series<date,double> GetDateSeries(){
 }
 BOOST_AUTO_TEST_CASE(SERIESTESTS)
 {
+    Frame<date,std::string> frame;
     {
         std::cout<<"Starting series<int,double> ctors"<<std::endl;
         auto series1 = GetIntSeries();

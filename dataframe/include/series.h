@@ -44,6 +44,8 @@ namespace laguna {
     protected:
         Series<TKey,T> applyBinaryOp(const Series<TKey, T> &a, std::function<T(const T &, const T &)> fop) const;
         Series<TKey,T> applyUnaryOp(std::function<T(const T &)> fop) const;
+        std::vector<std::pair<TKey,void*>> valuesAllRaw(){return this->SeriesStorage<TKey, T>::valuesAllRaw();}
+        std::vector<void*> valuesRaw(){return this->SeriesStorage<TKey, T>::valuesRaw();}
     public:
         Series(){};
         Series(const Series<TKey, T> &that);
@@ -81,8 +83,12 @@ namespace laguna {
         template<typename A>
         Series<A,T> mapKeys(std::function<A(const TKey&)> pred) const;
 
+        size_t size(){return this->SeriesStorage<TKey,T>::m_data.size();}
+
         T sum();
-        std::vector<std::pair<TKey,T>> values(){return this->SeriesStorage<TKey,T>::getValues();}
+        std::vector<std::pair<TKey,T>> valuesAll(){return this->SeriesStorage<TKey, T>::valuesAll();}
+        std::vector<T> values(){return this->SeriesStorage<TKey, T>::values();}
+
         std::vector<TKey> keys(){return this->SeriesStorage<TKey,T>::getKeys();}
         void deleteKey(const TKey& key){this->SeriesStorage<TKey,T>::deleteItem(key);};
     };
@@ -164,7 +170,7 @@ namespace laguna {
 
     template<typename TKey, typename T>
     Series<TKey, T> Series<TKey, T>::mapValues(std::function<T(const T &)> pred) const {
-        auto pairs = this->SeriesStorage<TKey,T>::getValues();
+        auto pairs = this->SeriesStorage<TKey, T>::valuesAll();
         for(auto& x:pairs){
             x.second=pred(x.second);
         }
@@ -174,7 +180,7 @@ namespace laguna {
     template<typename TKey, typename T>
     template<typename A>
     Series<A, T> Series<TKey, T>::mapKeys(std::function<A(const TKey &)> pred) const {
-        auto pairs = this->SeriesStorage<TKey,T>::getValues();
+        auto pairs = this->SeriesStorage<TKey, T>::valuesAll();
         std::vector<std::pair<A,T>> newpairs;
         std::transform(pairs.begin(),pairs.end(),
                 std::back_inserter(newpairs),
@@ -198,7 +204,7 @@ namespace laguna {
 
     template<typename TKey, typename T>
     T Series<TKey, T>::sum() {
-        auto values = this->SeriesStorage<TKey,T>::getValues();
+        auto values = this->SeriesStorage<TKey, T>::valuesAll();
         return std::accumulate(values.begin(),values.end(),T{},[](T& acc,const std::pair<TKey,T>& x){return acc+x.second;});
     }
 
