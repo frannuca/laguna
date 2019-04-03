@@ -7,33 +7,47 @@
 #include <vector>
 #include <memory>
 #include <utility>
+#include <map>
+#include <functional>
+#include <sstream>
 
 namespace laguna{
 
     using namespace std;
 
-
     class Storage{
 
         template<typename T>
-        static std::unordered_map<Storage *, map<string,vector<T>>> vectors_;
+        static map<Storage *, map<string,vector<T>>> vectors_;
 
-        template<typename T>
-        static std::unordered_map<Storage *, map<string,std::function<void(void)>>> clean_f;
+        static map<Storage *, map<string,std::function<void(void)>>> clean_f;
 
-        template<typename T>
-        static std::unordered_map<Storage *, map<string,std::function<std::string(void)>>> printer_f;
+        static map<Storage *, map<string,std::function<void(int)>>> inserter_f;
+
+        static map<Storage *, function<void(void)>> clean_object;
+
+
 
     public:
+
+        Storage();
         template<typename T>
-        std::vector<T>& NewColumn(const std::string name);
+        std::vector<T>& newVector(const std::string name,const T& fillingvalue);
 
         template<typename T>
-        bool DeleteColumn(const string& name);
+        bool deleteVector(const string &name);
+
 
         template<typename T>
-        std::vector<T>& Column(const std::string name);
+        std::vector<T>& getVector(const std::string name,bool addifnotexisting);
 
+        template<typename T>
+        bool hasColumn(const string& name){
+            return vectors_<T>.find(this)!=vectors_<T>.end() && vectors_<T>[this].find(name) !=  vectors_<T>[this].end();
+        }
+
+        vector<string> ColumnNames();
+        size_t insertItemAt(const string name, size_t offset);
         virtual ~Storage();
     };
 

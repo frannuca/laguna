@@ -1,71 +1,93 @@
 //implementations
 
 template<typename T>
-std::vector<T>& Storage::NewColumn(const std::string name) {
+std::vector<T>& Storage::newVector(const std::string name,const T& fillingvalue) {
     auto iter = vectors_<T>.find(this);
+
     if(iter == vectors_<T>.end()){
+
         map<string,vector<T>> obj;
         obj[name]=vector<T>();
-        // auto iter = vectors_<T>.emplace (this,obj);
+        vectors_<T>[this]=std::move(obj);
 
-
-        map<string,function<string(void)>> f_print;
-
-        f_print[name]=[&obj,&name]() {
-            ostringstream os;
-            vector<T> &m = obj[name];
-
-
-            os << name <<",";
-            for (auto item:m) {
-                os << item << ",";
-            }
-
-            string line = os.str();
-            line.substr(0, line.size() - 1) + "\n";
-            return line;
+        map<string,function<void(void)>> fcleancol;
+        fcleancol[name]=[this,name](){
+            auto& aa =vectors_<T>[this];
+            vectors_<T>[this].erase(name);
         };
-        printer_f<T>.emplace(this,f_print);
-//
-
-        map<string,function<void(void)>> f;
-        f[name]=[this,&name](){
+        clean_f[this] = std::move(fcleancol);
+        clean_object[this] = [this](){
             vectors_<T>.erase(this);
+            inserter_f.erase(this);
+            clean_f.erase(this);
         };
 
-        clean_f<T>.emplace(this,f);
+        map<string,std::function<void(int)>> inserter_obj;
+        inserter_obj[name] = [this,name,fillingvalue](int n){
+            auto& aa =vectors_<T>[this][name];
+            vectors_<T>[this][name].insert(vectors_<T>[this][name].begin()+n,fillingvalue);
+        };
+
+        inserter_f[this]=std::move(inserter_obj);
     }
+
     return vectors_<T>[this][name];
 }
 
 template<typename T>
-vector<T> &Storage::Column(const std::string name){
+vector<T> &Storage::getVector(const std::string name,bool addifnotexisting){
     auto iter = vectors_<T>.find(this);
     if(iter != vectors_<T>.end() && iter->second.find(name) != iter->second.end()){
 
         return vectors_<T>[this][name];
     }
-    throw invalid_argument("invalid column name "+name);
+    else if(addifnotexisting){
+        vectors_<T>[this][name]=std::move(vector<T>());
+        return vectors_<T>[this][name];
+    }
+    else{
+        throw invalid_argument("column "+name+ "  is not registered in this vector");
+    }
 }
 
 Storage::~Storage() {
+    clean_object[this]();
+    clean_object.erase(this);
 
 }
 
 template<typename T>
-bool Storage::DeleteColumn(const string &name) {
-    auto iter = clean_f<T>.find(this);
-    if(iter!=clean_f<T>.end()){
+bool Storage::deleteVector(const string &name) {
+    auto iter = clean_f.find(this);
+    if(iter!=clean_f.end()){
         iter->second[name]();
     }
-    return iter!=clean_f<T>.end();
+    return iter!=clean_f.end();
 }
 
-template<typename T>
-std::unordered_map<Storage*, map<string,vector<T>>> Storage::vectors_;
+Storage::Storage() {
+
+}
+
+
+size_t Storage::insertItemAt(const string name, size_t offset) {
+    inserter_f[this][name](offset);
+}
+
+vector <string> Storage::ColumnNames() {
+    vector<string> cols;
+    for(auto x:inserter_f[this]){
+        cols.push_back(x.first);
+    }
+    return std::move(cols);
+}
+
 
 template<typename T>
-std::unordered_map<Storage*, map<string,std::function<void(void)>>> Storage::clean_f;
+map<Storage*, map<string,vector<T>>> Storage::vectors_;
 
-template<typename T>
-std::unordered_map<Storage *, map<string,std::function<std::string(void)>>> Storage::printer_f;
+
+map<Storage *, map<string,std::function<void(int)>>> Storage::inserter_f;
+
+map<Storage*, map<string,std::function<void(void)>>> Storage::clean_f;
+map<Storage *, function<void(void)>> Storage::clean_object;

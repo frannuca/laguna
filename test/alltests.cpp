@@ -13,6 +13,7 @@
 #include <chrono>
 #include "../dataframe/include/Frame.h"
 #include "genericstorage.h"
+
 using namespace std;
 namespace tt = boost::test_tools;
 #include <iostream>
@@ -24,14 +25,32 @@ using namespace laguna;
 BOOST_AUTO_TEST_CASE(ALLTESTS)
 {
 
+    Frame<int> frame;
+    vector<pair<int,double>> series1 = {move(pair<int,double>(1,1.5)),move(pair<int,double>(2,2.5)),move(pair<int,double>(3,3.5))};
+    vector<pair<int,double>> series2 = {move(pair<int,double>(10,11.5)),move(pair<int,double>(12,12.5)),move(pair<int,double>(13,13.5))};
+    frame.withColumn<double>("col1",series1,numeric_limits<double>::quiet_NaN());
+
+    auto& col_1 = frame.col<double>("col1");
+    auto& index = frame.Index();
+
+    frame.withColumn("col2",series2,numeric_limits<double>::quiet_NaN());
+
+    auto& col_1b = frame.col<double>("col1");
+    auto& col_2b = frame.col<double>("col2");
+    auto& indexb = frame.Index();
+
+
     //testing column generation
     Storage gv;
 
     cout<<"creating a double column"<<endl;
-    auto& v_d = gv.NewColumn<double>("col1_double");
+    vector<string> key = {"a","b"};
+    vector<double>& v_d = gv.newVector<double>("col1_double",0.0);
 
+    ostringstream os;
+    cout<<os.str()<<endl;
     cout<<"creating a string column"<<endl;
-    auto& v_s = gv.NewColumn<std::string>("col2_string");
+    vector<string>& v_s = gv.newVector<std::string>("col2_string","NA");
 
 
     //adding data to double and string columns
@@ -39,14 +58,19 @@ BOOST_AUTO_TEST_CASE(ALLTESTS)
     v_s.push_back("inf");
 
     //accessing columns
-    auto xvd = gv.Column<double>("col1_double");
-    auto vxs = gv.Column<string>("col2_string");
+    auto& xvd = gv.getVector<double>("col1_double",true);
+    auto& vxs = gv.getVector<string>("col2_string",true);
 
     BOOST_CHECK_EQUAL(xvd[0],1.0);
     BOOST_CHECK_EQUAL(vxs[0],"inf");
 
-    BOOST_CHECK(gv.DeleteColumn<string>("col2_string"));
+    BOOST_CHECK(gv.hasColumn<double>("col1_double"));
+    BOOST_CHECK(gv.hasColumn<string>("col2_string"));
 
-    BOOST_CHECK_EXCEPTION( gv.Column<string>("col2_string"), invalid_argument, [](invalid_argument const& ex){return true;} );
+    BOOST_CHECK(gv.deleteVector<string>("col2_string"));
+
+    BOOST_CHECK(!gv.hasColumn<string>("col2_string"));
+
+    BOOST_CHECK_EXCEPTION(gv.getVector<string>("col2_string",false), invalid_argument, [](invalid_argument const& ex){return true;} );
     std::cout<<"finished";
 }
